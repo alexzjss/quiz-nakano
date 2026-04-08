@@ -74,10 +74,6 @@
     from { transform: scale(0.6) rotate(-5deg); opacity: 0; }
     to   { transform: scale(1) rotate(0deg); opacity: 1; }
   }
-  @keyframes screenOut {
-    from { transform: scale(1) rotate(0deg); opacity: 1; }
-    to   { transform: scale(1.2) rotate(5deg); opacity: 0; }
-  }
 
   /* ===== CARD ===== */
   .card {
@@ -214,11 +210,6 @@
     50%  { transform: scale(1.05); }
     100% { transform: scale(1); }
   }
-  @keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    25%  { transform: translateX(-8px); }
-    75%  { transform: translateX(8px); }
-  }
 
   /* ===== QUESTION SCREEN ===== */
   .question-badge {
@@ -308,9 +299,7 @@
   }
 
   /* ===== FINAL SCREEN ===== */
-  #screen-final {
-    gap: 1rem;
-  }
+  #screen-final, #screen-timesup { gap: 1rem; }
   .final-title {
     font-family: 'Bangers', cursive;
     font-size: clamp(2.5rem, 8vw, 5rem);
@@ -329,44 +318,46 @@
   #student-input {
     background: rgba(255,255,255,0.08);
     border: 2px solid rgba(255,255,255,0.2);
-    border-radius: 16px;
-    padding: 1.2rem;
+    border-radius: 50px;
+    padding: 1.2rem 2rem;
     width: 100%;
     color: white;
-    font-family: 'Nunito', sans-serif;
-    font-size: 1rem;
-    resize: vertical;
-    min-height: 150px;
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.2rem;
     outline: none;
-    transition: border-color 0.3s;
+    transition: all 0.3s;
+    text-align: center;
   }
   #student-input:focus {
     border-color: #ffd93d;
-    box-shadow: 0 0 20px rgba(255,217,61,0.3);
+    box-shadow: 0 0 25px rgba(255,217,61,0.4);
+    transform: scale(1.02);
   }
-  #student-input::placeholder { color: rgba(255,255,255,0.3); }
+  #student-input::placeholder { color: rgba(255,255,255,0.4); font-size: 1rem;}
 
-  /* fake timer */
-  .fake-timer {
+  /* real timer */
+  .real-timer {
     font-family: 'Press Start 2P', monospace;
-    font-size: clamp(1.2rem, 4vw, 2rem);
+    font-size: clamp(2rem, 6vw, 3.5rem);
     color: #ff6b6b;
-    margin: 0.5rem 0;
-    animation: timerFlash 1s step-end infinite;
+    margin: 1rem 0;
+    text-shadow: 0 0 15px rgba(255, 107, 107, 0.8);
+    animation: pulseTimer 1s infinite alternate;
   }
-  @keyframes timerFlash {
-    0%, 100% { opacity: 1; }
-    50%  { opacity: 0.5; color: #ffd93d; }
+  @keyframes pulseTimer {
+    from { transform: scale(1); text-shadow: 0 0 15px rgba(255, 107, 107, 0.8); }
+    to { transform: scale(1.05); text-shadow: 0 0 30px rgba(255, 217, 61, 1); color: #ffd93d; }
   }
   .timer-label {
-    font-size: 0.75rem;
-    color: rgba(255,255,255,0.4);
-    font-family: 'Nunito', sans-serif;
+    font-size: 0.85rem;
+    color: #ffd93d;
+    font-family: 'Fredoka One', cursive;
     margin-bottom: 0.25rem;
+    text-transform: uppercase;
   }
 
   /* student count */
-  #student-count-display {
+  #student-count-display, #final-student-count {
     font-family: 'Bangers', cursive;
     font-size: 5rem;
     line-height: 1;
@@ -383,6 +374,23 @@
     color: rgba(255,255,255,0.6);
     font-size: 1rem;
     margin-bottom: 0.5rem;
+  }
+
+  /* floating entered name */
+  .floating-name {
+    position: fixed;
+    font-family: 'Bangers', cursive;
+    font-size: 3rem;
+    color: #fff;
+    text-shadow: 2px 2px 10px #ff6b6b, -2px -2px 10px #a29bfe;
+    pointer-events: none;
+    z-index: 300;
+    animation: floatName 1.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+    bottom: 30%;
+  }
+  @keyframes floatName {
+    0% { transform: translateY(0) scale(0.5); opacity: 1; }
+    100% { transform: translateY(-400px) scale(1.8) rotate(15deg); opacity: 0; }
   }
 
   /* chaos effects */
@@ -427,7 +435,7 @@
     to   { opacity: 1; transform: translateY(0); }
   }
 
-  /* themes for different questions */
+  /* themes */
   .theme-purple { --bg: #1a0533; }
   .theme-green  { --bg: #00251a; }
   .theme-blue   { --bg: #001f3d; }
@@ -442,7 +450,6 @@
     margin-top: 0.5rem;
   }
 
-  /* score display */
   .score-bubble {
     position: fixed;
     top: 1.5rem; right: 1.5rem;
@@ -457,29 +464,28 @@
     backdrop-filter: blur(10px);
   }
 
-  /* ===== RESPONSIVE ===== */
   @media (max-width: 500px) {
     .card { padding: 1.5rem 1rem; }
     .question-text { font-size: 1.2rem; }
+  }
+
+  @keyframes shake {
+    0%,100%{transform:translateX(0)}
+    20%{transform:translateX(-15px) rotate(-2deg)}
+    40%{transform:translateX(15px) rotate(2deg)}
+    60%{transform:translateX(-10px)}
+    80%{transform:translateX(10px)}
   }
 </style>
 </head>
 <body>
 
-<!-- Floating emojis background -->
 <div class="floaters-container" id="floaters"></div>
 <canvas id="particles"></canvas>
-
-<!-- Score bubble -->
 <div class="score-bubble" id="score-bubble">⭐ 0 pts</div>
-
-<!-- Feedback overlay -->
 <div class="feedback-overlay" id="feedback-overlay"></div>
 
-<!-- Main App -->
 <div id="app">
-
-  <!-- INTRO SCREEN -->
   <div class="screen active card" id="screen-intro">
     <div class="big-title">DESAFIO<br>NAKANO</div>
     <div class="subtitle">🎓 Uma homenagem ao professor mais top da EACH</div>
@@ -495,13 +501,12 @@
     <p class="hint-text" style="margin-top:1rem">Boa sorte para todo mundo... vão precisar 😏</p>
   </div>
 
-  <!-- QUESTION SCREEN -->
   <div class="screen" id="screen-question">
     <div class="progress-track">
       <div class="progress-fill" id="progress-fill" style="width:0%"></div>
     </div>
     <div class="card">
-      <span class="question-number" id="q-number">PERGUNTA 1 / 10</span>
+      <span class="question-number" id="q-number">PERGUNTA 1 / X</span>
       <span class="question-badge" id="q-badge">👨‍🏫 Professor</span>
       <span class="question-emoji" id="q-emoji">🎯</span>
       <div class="question-text" id="q-text">Carregando...</div>
@@ -513,22 +518,34 @@
     </button>
   </div>
 
-  <!-- FINAL SCREEN -->
   <div class="screen" id="screen-final">
     <div class="card">
       <div class="final-title">🏆 MOMENTO<br>DA VERDADE!</div>
-      <p class="final-subtitle">Prof. Fábio, última missão! Liste o máximo de alunos da sua turma que conseguir:</p>
+      <p class="final-subtitle">Prof. Fábio, última missão! Digite os nomes dos alunos (um por vez) e dê ENTER:</p>
 
-      <div class="timer-label">⏱️ TEMPO RESTANTE (não, não tem limite... é uma pegadinha)</div>
-      <div class="fake-timer" id="fake-timer">03:00</div>
+      <div class="timer-label">⏱️ TEMPO RESTANTE (AGORA É SÉRIO!)</div>
+      <div class="real-timer" id="real-timer">01:00</div>
 
-      <div class="count-label">Alunos mencionados:</div>
+      <div class="count-label">Alunos lembrados:</div>
       <div id="student-count-display">0</div>
 
-      <textarea id="student-input" placeholder="Digite os nomes aqui... um por linha!
-(Quanto mais nomes, mais caótico fica isso aqui 👀)" oninput="onStudentInput()"></textarea>
+      <input type="text" id="student-input" placeholder="Digite UM nome e aperte ENTER..." onkeypress="handleEnter(event)" autocomplete="off">
 
-      <p class="hint-text" style="margin-top:0.75rem">💡 Dica: tem pelo menos 60 alunos nessa sala... 👀</p>
+      <p class="hint-text" style="margin-top:1rem">💡 Dica: tem pelo menos 60 alunos nessa sala... mostre que a memória tá em dia! 👀</p>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-timesup">
+    <div class="card">
+      <div class="final-title" style="font-size: 3.5rem;">⏰ ACABOU O TEMPO!</div>
+      <p class="final-subtitle" style="margin-top: 1rem; font-size: 1.5rem;">Total de alunos que você lembrou:</p>
+      
+      <div id="final-student-count">0</div>
+      
+      <p class="desc" style="margin-top: 2rem; font-size: 1.2rem;">
+        Seja a memória boa ou não, a turma toda agradece pelas aulas! <br><br>
+        <strong>Hora de entregar o prêmio real! 📘</strong>
+      </p>
     </div>
   </div>
 
@@ -536,158 +553,80 @@
 
 <script>
 // ============================================================
-//  DATA
+//  DATA (Questões Expandidas)
 // ============================================================
 const questions = [
-  // Q1 - Sala (sobre C)
   {
-    target: 'sala',
-    emoji: '💻',
-    theme: 'theme-blue',
+    target: 'sala', emoji: '💻', theme: 'theme-blue',
     text: 'Em C, o que a função `printf` faz?',
-    options: [
-      'Lê dados do teclado',
-      'Imprime texto na tela ✅',
-      'Aloca memória dinamicamente',
-      'Cria uma variável nova'
-    ],
-    correct: 1,
-    reveal: 'printf = "print formatted". Sim, é literalmente pra isso! 🖨️'
+    options: ['Lê dados do teclado', 'Imprime texto na tela ✅', 'Aloca memória dinamicamente', 'Cria uma variável nova'],
+    correct: 1, reveal: 'printf = "print formatted". Sim, é literalmente pra isso! 🖨️'
   },
-  // Q2 - Professor
   {
-    target: 'professor',
-    emoji: '🎓',
-    theme: 'theme-purple',
+    target: 'professor', emoji: '🎓', theme: 'theme-purple',
     text: 'Em qual área Fábio Nakano se formou na graduação?',
-    options: [
-      'Ciência da Computação',
-      'Matemática',
-      'Engenharia Elétrica ✅',
-      'Física'
-    ],
-    correct: 2,
-    reveal: 'Engenharia Elétrica pela USP, formado em 1993! Versátil demais 🔌'
+    options: ['Ciência da Computação', 'Matemática', 'Engenharia Elétrica ✅', 'Física'],
+    correct: 2, reveal: 'Engenharia Elétrica pela USP, formado em 1993! Versátil demais 🔌'
   },
-  // Q3 - Sala (C)
   {
-    target: 'sala',
-    emoji: '🤔',
-    theme: 'theme-green',
-    text: 'Qual é o valor de `5 % 2` em C?',
-    options: [
-      '2',
-      '2.5',
-      '1 ✅',
-      '0'
-    ],
-    correct: 2,
-    reveal: '% é o operador módulo (resto da divisão). 5 ÷ 2 = 2 resto 1. Matemática básica! 🧮'
+    target: 'sala', emoji: '😭', theme: 'theme-dark',
+    text: 'O que acontece se você esquecer um ponto e vírgula (;) no final de uma linha em C?',
+    options: ['O programa roda mais rápido', 'O C perdoa e ignora', 'O compilador chora e a tela fica vermelha ✅', 'A variável vira global'],
+    correct: 2, reveal: 'Syntax Error: expected \';\' before... O clássico pesadelo do programador iniciante! 🩸'
   },
-  // Q4 - Professor
   {
-    target: 'professor',
-    emoji: '🔬',
-    theme: 'theme-pink',
+    target: 'professor', emoji: '🔬', theme: 'theme-pink',
     text: 'Qual foi o tema do doutorado do Prof. Nakano?',
-    options: [
-      'Otimização de redes neurais',
-      'Probabilidade de Paternidade ✅',
-      'Mapeamento de campo acústico',
-      'Análise de mercado financeiro'
-    ],
-    correct: 1,
-    reveal: '"Um Novo Modelo para Cálculo de Probabilidade de Paternidade" - Bioinformática! DNA e estatística juntos 🧬'
+    options: ['Otimização de redes neurais', 'Probabilidade de Paternidade ✅', 'Mapeamento de campo acústico', 'Análise de mercado financeiro'],
+    correct: 1, reveal: '"Um Novo Modelo para Cálculo de Probabilidade de Paternidade" - Bioinformática! DNA e estatística juntos 🧬'
   },
-  // Q5 - Sala (cotidiano)
   {
-    target: 'sala',
-    emoji: '🌅',
-    theme: 'theme-orange',
+    target: 'sala', emoji: '👑', theme: 'theme-orange',
+    text: 'Sejamos sinceros, qual a melhor linguagem de programação do mundo?',
+    options: ['C', 'C', 'C', 'C ✅ (Essa aqui tem mais C)'],
+    correct: 3, reveal: 'Na aula dele, a resposta é sempre C. Não ouse dizer Python! 🐍🚫'
+  },
+  {
+    target: 'professor', emoji: '📅', theme: 'theme-green',
+    text: 'De acordo com os registros antigos (Lattes), em que ano o professor concluiu o Mestrado?',
+    options: ['1995', '1997 ✅', '2000', '1993'],
+    correct: 1, reveal: '1997! Mestrado em Engenharia Elétrica também pela USP. O tempo voa! ⏳'
+  },
+  {
+    target: 'sala', emoji: '🌅', theme: 'theme-orange',
     text: 'Qual a MELHOR ordem para a manhã perfeita?',
-    options: [
-      'Acordar → Tomar banho → Se vestir → Escovar dentes → Café ✅',
-      'Acordar → Café → Banho → Escovar dentes → Se vestir',
-      'Acordar → Escovar dentes → Café → Banho → Se vestir',
-      'Café → Acordar (não existe essa ordem)'
-    ],
-    correct: 0,
-    reveal: 'A ciência da manhã: banho acorda, vestir depois do banho (óbvio), dentes depois do café ☕'
+    options: ['Acordar → Tomar banho → Se vestir → Escovar dentes → Café ✅', 'Acordar → Café → Banho → Escovar dentes → Se vestir', 'Acordar → Escovar dentes → Café → Banho → Se vestir', 'Café → Acordar (não existe essa ordem)'],
+    correct: 0, reveal: 'A ciência da manhã: banho acorda, vestir depois do banho (óbvio), dentes depois do café ☕'
   },
-  // Q6 - Professor
   {
-    target: 'professor',
-    emoji: '🏢',
-    theme: 'theme-dark',
+    target: 'professor', emoji: '🏢', theme: 'theme-dark',
     text: 'Antes de ser professor, o Nakano trabalhou como analista de sistemas em qual empresa famosa?',
-    options: [
-      'Globo',
-      'Editora Abril ✅',
-      'Folha de S.Paulo',
-      'Banco Itaú'
-    ],
-    correct: 1,
-    reveal: 'Editora Abril, de 1993 a 1994! Depois foi pra Supremum por 8 anos. Carreira bem variada 📰'
+    options: ['Globo', 'Editora Abril ✅', 'Folha de S.Paulo', 'Banco Itaú'],
+    correct: 1, reveal: 'Editora Abril, de 1993 a 1994! Depois foi pra Supremum por 8 anos. 📰'
   },
-  // Q7 - Sala (C)
   {
-    target: 'sala',
-    emoji: '🧩',
-    theme: 'theme-purple',
-    text: 'Em C, qual keyword é usada para declarar uma constante?',
-    options: [
-      'var',
-      'static',
-      'const ✅',
-      'final'
-    ],
-    correct: 2,
-    reveal: '`const` em C garante que o valor não muda. `final` é de Java/Swift. `var` é JS. `static` é outra coisa! 🔒'
+    target: 'sala', emoji: '🔤', theme: 'theme-blue',
+    text: 'Como nós declaramos uma String nativamente em C?',
+    options: ['string texto;', 'String texto = "";', 'char texto[50]; ✅', 'let texto;'],
+    correct: 2, reveal: 'Pegadinha! C não tem tipo "string" nativo, a gente sofre usando array de char! 🥲'
   },
-  // Q8 - Professor
   {
-    target: 'professor',
-    emoji: '🌍',
-    theme: 'theme-green',
+    target: 'professor', emoji: '🌍', theme: 'theme-green',
     text: 'O Prof. Nakano fala quantos idiomas segundo o Lattes?',
-    options: [
-      '1 (só português)',
-      '2 (português e inglês)',
-      '3 (português, inglês e japonês) ✅',
-      '4 (mais francês)'
-    ],
-    correct: 2,
-    reveal: 'Português, Inglês (bem) e Japonês (razoavelmente). Trilíngue! 🗾🇧🇷🇺🇸'
+    options: ['1 (só português)', '2 (português e inglês)', '3 (português, inglês e japonês) ✅', '4 (mais francês)'],
+    correct: 2, reveal: 'Português, Inglês (bem) e Japonês (razoavelmente). Trilíngue! 🗾🇧🇷🇺🇸'
   },
-  // Q9 - Sala (C)
   {
-    target: 'sala',
-    emoji: '🔁',
-    theme: 'theme-blue',
+    target: 'sala', emoji: '🔁', theme: 'theme-purple',
     text: 'Qual loop em C é garantido executar ao menos UMA vez?',
-    options: [
-      'for',
-      'while',
-      'do...while ✅',
-      'foreach'
-    ],
-    correct: 2,
-    reveal: 'do...while executa o bloco e SÓ DEPOIS verifica a condição. Então sempre roda pelo menos uma vez! 🔄'
+    options: ['for', 'while', 'do...while ✅', 'foreach'],
+    correct: 2, reveal: 'do...while executa o bloco e SÓ DEPOIS verifica a condição! 🔄'
   },
-  // Q10 - Professor
   {
-    target: 'professor',
-    emoji: '🏆',
-    theme: 'theme-orange',
+    target: 'professor', emoji: '🏆', theme: 'theme-orange',
     text: 'Qual prêmio o Prof. Nakano recebeu em 2003 no IME-USP?',
-    options: [
-      'Best Paper Award',
-      'Best Student Presentation ✅',
-      'Distinguished Researcher',
-      'Top Teacher Award'
-    ],
-    correct: 1,
-    reveal: '"Best Student Presentation" no IME-USP em 2003! Carreira de sucesso desde cedo 🌟'
+    options: ['Best Paper Award', 'Best Student Presentation ✅', 'Distinguished Researcher', 'Top Teacher Award'],
+    correct: 1, reveal: '"Best Student Presentation" no IME-USP em 2003! Carreira de sucesso desde cedo 🌟'
   }
 ];
 
@@ -697,33 +636,26 @@ const questions = [
 let currentQ = 0;
 let score = 0;
 let answered = false;
-let fakeTimerInterval = null;
-let fakeTimerSec = 180;
-let chaosLevel = 0;
+let realTimerSec = 60; // 1 minuto
+let realTimerInterval = null;
+let studentCount = 0;
 
 // ============================================================
-//  PARTICLES
+//  PARTICLES & FLOATERS
 // ============================================================
 const canvas = document.getElementById('particles');
 const ctx = canvas.getContext('2d');
 let pList = [];
 
-function resizeCanvas() {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-}
-resizeCanvas();
-window.addEventListener('resize', resizeCanvas);
+function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+resizeCanvas(); window.addEventListener('resize', resizeCanvas);
 
 function initParticles() {
   pList = [];
   for (let i = 0; i < 60; i++) {
     pList.push({
-      x: Math.random() * canvas.width,
-      y: Math.random() * canvas.height,
-      r: Math.random() * 2 + 0.5,
-      dx: (Math.random() - 0.5) * 0.4,
-      dy: (Math.random() - 0.5) * 0.4,
+      x: Math.random() * canvas.width, y: Math.random() * canvas.height,
+      r: Math.random() * 2 + 0.5, dx: (Math.random() - 0.5) * 0.4, dy: (Math.random() - 0.5) * 0.4,
       alpha: Math.random() * 0.5 + 0.1,
       color: ['#ff6b6b','#ffd93d','#6bcb77','#4d96ff','#a29bfe','#fd79a8'][Math.floor(Math.random()*6)]
     });
@@ -734,34 +666,22 @@ initParticles();
 function animParticles() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   pList.forEach(p => {
-    ctx.beginPath();
-    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-    ctx.fillStyle = p.color;
-    ctx.globalAlpha = p.alpha;
-    ctx.fill();
+    ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    ctx.fillStyle = p.color; ctx.globalAlpha = p.alpha; ctx.fill();
     p.x += p.dx; p.y += p.dy;
-    if (p.x < 0) p.x = canvas.width;
-    if (p.x > canvas.width) p.x = 0;
-    if (p.y < 0) p.y = canvas.height;
-    if (p.y > canvas.height) p.y = 0;
+    if (p.x < 0) p.x = canvas.width; if (p.x > canvas.width) p.x = 0;
+    if (p.y < 0) p.y = canvas.height; if (p.y > canvas.height) p.y = 0;
   });
-  ctx.globalAlpha = 1;
-  requestAnimationFrame(animParticles);
+  ctx.globalAlpha = 1; requestAnimationFrame(animParticles);
 }
 animParticles();
 
-// ============================================================
-//  FLOATERS
-// ============================================================
 const FLOATER_EMOJIS = ['💻','🧮','🔥','⚡','🎯','🏆','🎮','🌟','💡','📚','🎲','🚀','🧪','⚙️','🎓','🤖'];
 function spawnFloater() {
-  const el = document.createElement('div');
-  el.className = 'floater';
+  const el = document.createElement('div'); el.className = 'floater';
   el.textContent = FLOATER_EMOJIS[Math.floor(Math.random() * FLOATER_EMOJIS.length)];
-  el.style.left = Math.random() * 100 + 'vw';
-  el.style.animationDuration = (Math.random() * 6 + 5) + 's';
-  el.style.animationDelay = (Math.random() * 2) + 's';
-  el.style.fontSize = (Math.random() * 2 + 1) + 'rem';
+  el.style.left = Math.random() * 100 + 'vw'; el.style.animationDuration = (Math.random() * 6 + 5) + 's';
+  el.style.animationDelay = (Math.random() * 2) + 's'; el.style.fontSize = (Math.random() * 2 + 1) + 'rem';
   document.getElementById('floaters').appendChild(el);
   setTimeout(() => el.remove(), 11000);
 }
@@ -770,32 +690,20 @@ setInterval(spawnFloater, 600);
 // ============================================================
 //  QUIZ LOGIC
 // ============================================================
-function startQuiz() {
-  showScreen('screen-question');
-  renderQuestion();
-}
+function startQuiz() { showScreen('screen-question'); renderQuestion(); }
 
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   const target = document.getElementById(id);
-  target.classList.add('active');
-  target.style.animation = 'none';
-  requestAnimationFrame(() => {
-    target.style.animation = '';
-  });
+  target.classList.add('active'); target.style.animation = 'none';
+  requestAnimationFrame(() => { target.style.animation = ''; });
 }
 
 const THEMES = ['theme-purple','theme-green','theme-blue','theme-orange','theme-pink','theme-dark'];
-function applyTheme(theme) {
-  document.body.classList.remove(...THEMES);
-  document.body.classList.add(theme);
-}
+function applyTheme(theme) { document.body.classList.remove(...THEMES); document.body.classList.add(theme); }
 
 function renderQuestion() {
-  answered = false;
-  const q = questions[currentQ];
-  applyTheme(q.theme || 'theme-blue');
-
+  answered = false; const q = questions[currentQ]; applyTheme(q.theme || 'theme-blue');
   const total = questions.length;
   document.getElementById('q-number').textContent = `PERGUNTA ${currentQ + 1} / ${total}`;
   document.getElementById('q-text').textContent = q.text;
@@ -803,149 +711,111 @@ function renderQuestion() {
   document.getElementById('answer-reveal').innerHTML = '';
   document.getElementById('next-btn').style.display = 'none';
 
-  // Badge
   const badge = document.getElementById('q-badge');
-  if (q.target === 'professor') {
-    badge.className = 'question-badge badge-professor';
-    badge.textContent = '👨‍🏫 Para o Professor!';
-  } else {
-    badge.className = 'question-badge badge-sala';
-    badge.textContent = '🎒 Para a Sala!';
-  }
+  if (q.target === 'professor') { badge.className = 'question-badge badge-professor'; badge.textContent = '👨‍🏫 Para o Professor!'; } 
+  else { badge.className = 'question-badge badge-sala'; badge.textContent = '🎒 Para a Sala!'; }
 
-  // Progress
   document.getElementById('progress-fill').style.width = (currentQ / total * 100) + '%';
 
-  // Options
-  const container = document.getElementById('options-container');
-  container.innerHTML = '';
+  const container = document.getElementById('options-container'); container.innerHTML = '';
   q.options.forEach((opt, i) => {
-    const btn = document.createElement('button');
-    btn.className = 'btn-option';
+    const btn = document.createElement('button'); btn.className = 'btn-option';
     btn.innerHTML = `<span style="margin-right:0.5rem;font-size:1.1rem">${['🅰️','🅱️','🅲','🅳'][i]}</span> ${opt.replace(' ✅', '')}`;
-    btn.onclick = () => selectOption(i, btn);
-    container.appendChild(btn);
+    btn.onclick = () => selectOption(i, btn); container.appendChild(btn);
   });
 }
 
 function selectOption(index, btn) {
-  if (answered) return;
-  answered = true;
-  const q = questions[currentQ];
+  if (answered) return; answered = true; const q = questions[currentQ];
   const allBtns = document.querySelectorAll('.btn-option');
 
   if (index === q.correct) {
-    btn.classList.add('correct');
-    score += 10;
+    btn.classList.add('correct'); score += 10;
     document.getElementById('score-bubble').textContent = `⭐ ${score} pts`;
-    showFeedback('✅ CORRETO!', '#6bcb77');
-    spawnConfetti(20);
+    showFeedback('✅ CORRETO!', '#6bcb77'); spawnConfetti(20);
   } else {
-    btn.classList.add('wrong');
-    allBtns[q.correct].classList.add('correct');
-    showFeedback('❌ ERROU!', '#ff6b6b');
-    shakeScreen();
+    btn.classList.add('wrong'); allBtns[q.correct].classList.add('correct');
+    showFeedback('❌ ERROU!', '#ff6b6b'); shakeScreen();
   }
 
-  // reveal
-  document.getElementById('answer-reveal').innerHTML =
-    `<div class="answer-reveal">💬 ${q.reveal}</div>`;
-
+  document.getElementById('answer-reveal').innerHTML = `<div class="answer-reveal">💬 ${q.reveal}</div>`;
   document.getElementById('next-btn').style.display = 'inline-block';
 }
 
 function nextQuestion() {
   currentQ++;
-  if (currentQ >= questions.length) {
-    showFinalScreen();
-  } else {
-    showScreen('screen-question');
-    renderQuestion();
-  }
+  if (currentQ >= questions.length) { showFinalScreen(); } 
+  else { showScreen('screen-question'); renderQuestion(); }
 }
 
 function showFinalScreen() {
-  applyTheme('theme-purple');
-  showScreen('screen-final');
+  applyTheme('theme-purple'); showScreen('screen-final');
   document.getElementById('progress-fill').style.width = '100%';
-  document.getElementById('score-bubble').textContent = `⭐ ${score} pts`;
-  startFakeTimer();
-  spawnConfetti(40);
+  startRealTimer(); spawnConfetti(40);
+  document.getElementById('student-input').focus();
 }
 
 // ============================================================
-//  FAKE TIMER
+//  REAL TIMER & STUDENT INPUT
 // ============================================================
-function startFakeTimer() {
-  fakeTimerSec = 180;
-  updateFakeTimer();
-  fakeTimerInterval = setInterval(() => {
-    fakeTimerSec -= 1;
-    if (fakeTimerSec <= 0) fakeTimerSec = 999; // reset lol
-    updateFakeTimer();
+function startRealTimer() {
+  realTimerSec = 60; updateRealTimer();
+  realTimerInterval = setInterval(() => {
+    realTimerSec--; updateRealTimer();
+    if (realTimerSec <= 0) {
+      clearInterval(realTimerInterval);
+      endGame();
+    }
   }, 1000);
 }
 
-function updateFakeTimer() {
-  const m = Math.floor(fakeTimerSec / 60).toString().padStart(2, '0');
-  const s = (fakeTimerSec % 60).toString().padStart(2, '0');
-  document.getElementById('fake-timer').textContent = `${m}:${s}`;
+function updateRealTimer() {
+  const m = Math.floor(realTimerSec / 60).toString().padStart(2, '0');
+  const s = (realTimerSec % 60).toString().padStart(2, '0');
+  document.getElementById('real-timer').textContent = `${m}:${s}`;
+}
+
+function handleEnter(e) {
+  if (e.key === 'Enter') {
+    const val = e.target.value.trim();
+    if (val.length > 0) {
+      studentCount++;
+      document.getElementById('student-count-display').textContent = studentCount;
+      e.target.value = '';
+      
+      spawnFloatingName(val);
+      applyChaos(studentCount);
+    }
+  }
+}
+
+function endGame() {
+  showScreen('screen-timesup');
+  applyTheme('theme-dark');
+  document.getElementById('final-student-count').textContent = studentCount;
+  spawnConfetti(100);
+  rainbowBody();
 }
 
 // ============================================================
-//  STUDENT INPUT CHAOS
+//  CHAOS & EFFECTS
 // ============================================================
-function onStudentInput() {
-  const val = document.getElementById('student-input').value;
-  const lines = val.split('\n').filter(l => l.trim().length > 0);
-  const count = lines.length;
-  document.getElementById('student-count-display').textContent = count;
-
-  chaosLevel = count;
-  applyChaos(count);
+function spawnFloatingName(name) {
+  const el = document.createElement('div');
+  el.className = 'floating-name';
+  el.textContent = name;
+  el.style.left = (Math.random() * 60 + 20) + 'vw';
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 1500);
 }
 
 function applyChaos(count) {
   const body = document.body;
-
-  // Color pulses
-  if (count >= 3) {
-    body.style.animation = 'none';
-    document.getElementById('student-count-display').style.color = '#6bcb77';
-    spawnChaosStars(3);
-  }
-  if (count >= 10) {
-    document.getElementById('student-count-display').style.color = '#4d96ff';
-    spawnChaosStars(5);
-    spawnConfetti(10);
-  }
-  if (count >= 20) {
-    document.getElementById('student-count-display').style.color = '#ffd93d';
-    spawnChaosStars(8);
-    spawnConfetti(15);
-    shakeScreen();
-  }
-  if (count >= 30) {
-    document.getElementById('student-count-display').style.color = '#ff6b6b';
-    spawnChaosStars(12);
-    spawnConfetti(20);
-    rainbowBody();
-  }
-  if (count >= 40) {
-    spawnChaosStars(20);
-    spawnConfetti(30);
-    shakeScreen();
-    rainbowBody();
-  }
-  if (count >= 50) {
-    spawnChaosStars(30);
-    spawnConfetti(50);
-    shakeScreen();
-    // all-out madness
-    for (let i = 0; i < 5; i++) {
-      setTimeout(() => { spawnConfetti(20); shakeScreen(); }, i * 200);
-    }
-  }
+  if (count >= 3) { document.getElementById('student-count-display').style.color = '#6bcb77'; spawnChaosStars(3); }
+  if (count >= 8) { document.getElementById('student-count-display').style.color = '#4d96ff'; spawnChaosStars(5); spawnConfetti(5); }
+  if (count >= 15) { document.getElementById('student-count-display').style.color = '#ffd93d'; spawnChaosStars(8); spawnConfetti(10); shakeScreen(); }
+  if (count >= 25) { document.getElementById('student-count-display').style.color = '#ff6b6b'; spawnChaosStars(15); rainbowBody(); }
+  if (count >= 40) { spawnChaosStars(20); spawnConfetti(20); shakeScreen(); rainbowBody(); }
 }
 
 let rainbowTimeout = null;
@@ -954,18 +824,11 @@ function rainbowBody() {
   let ci = 0;
   if (rainbowTimeout) clearInterval(rainbowTimeout);
   rainbowTimeout = setInterval(() => {
-    document.body.style.backgroundColor = colors[ci % colors.length];
-    ci++;
+    document.body.style.backgroundColor = colors[ci % colors.length]; ci++;
   }, 300);
-  setTimeout(() => {
-    clearInterval(rainbowTimeout);
-    rainbowTimeout = null;
-  }, 3000);
+  setTimeout(() => { clearInterval(rainbowTimeout); rainbowTimeout = null; applyTheme('theme-purple'); }, 2000);
 }
 
-// ============================================================
-//  EFFECTS
-// ============================================================
 function showFeedback(msg, color) {
   const overlay = document.getElementById('feedback-overlay');
   overlay.innerHTML = `<div class="feedback-msg" style="color:${color}">${msg}</div>`;
@@ -973,71 +836,33 @@ function showFeedback(msg, color) {
 }
 
 function shakeScreen() {
-  const app = document.getElementById('app');
-  app.style.animation = 'shake 0.4s ease';
+  const app = document.getElementById('app'); app.style.animation = 'shake 0.4s ease';
   setTimeout(() => { app.style.animation = ''; }, 400);
 }
 
 function spawnConfetti(count) {
   const colors = ['#ff6b6b','#ffd93d','#6bcb77','#4d96ff','#a29bfe','#fd79a8','#ffffff'];
   for (let i = 0; i < count; i++) {
-    const el = document.createElement('div');
-    el.className = 'confetti-piece';
+    const el = document.createElement('div'); el.className = 'confetti-piece';
     const color = colors[Math.floor(Math.random() * colors.length)];
-    const tx = (Math.random() - 0.5) * 400;
-    const rot = Math.random() * 1080;
-    const dur = (Math.random() * 1.5 + 1) + 's';
-    const br = Math.random() > 0.5 ? '50%' : '2px';
-    el.style.cssText = `
-      left:${Math.random()*100}vw;
-      top:-10px;
-      background:${color};
-      --tx:${tx}px;
-      --rot:${rot}deg;
-      --dur:${dur};
-      --br:${br};
-      width:${Math.random()*8+6}px;
-      height:${Math.random()*8+6}px;
-    `;
-    document.body.appendChild(el);
-    setTimeout(() => el.remove(), 3000);
+    const tx = (Math.random() - 0.5) * 400; const rot = Math.random() * 1080;
+    const dur = (Math.random() * 1.5 + 1) + 's'; const br = Math.random() > 0.5 ? '50%' : '2px';
+    el.style.cssText = `left:${Math.random()*100}vw; top:-10px; background:${color}; --tx:${tx}px; --rot:${rot}deg; --dur:${dur}; --br:${br}; width:${Math.random()*8+6}px; height:${Math.random()*8+6}px;`;
+    document.body.appendChild(el); setTimeout(() => el.remove(), 3000);
   }
 }
 
 function spawnChaosStars(count) {
   const emojis = ['⭐','✨','💫','🌟','🔥','💥','🎉','🎊','🏆','🥳','🎮','💎','🚀','⚡','🌈'];
   for (let i = 0; i < count; i++) {
-    const el = document.createElement('div');
-    el.className = 'chaos-star';
+    const el = document.createElement('div'); el.className = 'chaos-star';
     el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
-    const tx = (Math.random() - 0.5) * 500;
-    const ty = (Math.random() - 0.5) * 500;
+    const tx = (Math.random() - 0.5) * 500; const ty = (Math.random() - 0.5) * 500;
     const rot = (Math.random() - 0.5) * 720 + 'deg';
-    el.style.cssText = `
-      left:${Math.random()*80+10}vw;
-      top:${Math.random()*80+10}vh;
-      font-size:${Math.random()*2+1}rem;
-      --tx:${tx}px;
-      --ty:${ty}px;
-      --rot:${rot};
-    `;
-    document.body.appendChild(el);
-    setTimeout(() => el.remove(), 2000);
+    el.style.cssText = `left:${Math.random()*80+10}vw; top:${Math.random()*80+10}vh; font-size:${Math.random()*2+1}rem; --tx:${tx}px; --ty:${ty}px; --rot:${rot};`;
+    document.body.appendChild(el); setTimeout(() => el.remove(), 2000);
   }
 }
-
-// shake keyframes
-const shakeStyle = document.createElement('style');
-shakeStyle.textContent = `
-  @keyframes shake {
-    0%,100%{transform:translateX(0)}
-    20%{transform:translateX(-15px) rotate(-2deg)}
-    40%{transform:translateX(15px) rotate(2deg)}
-    60%{transform:translateX(-10px)}
-    80%{transform:translateX(10px)}
-  }
-`;
-document.head.appendChild(shakeStyle);
 </script>
 </body>
 </html>
